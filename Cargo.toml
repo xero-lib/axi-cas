@@ -4,3 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+rand = { version = "0.10.1", features = ["chacha"] }
+rayon = "1.12.0"
+rug = "1.29.0"
+
+

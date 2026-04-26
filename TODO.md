@@ -1,0 +1,6 @@
+- [ ] Lexing
+- [ ] Pratt Parsing to DAG within Arena
+- [ ] Term Rewriting
+  - [ ] Order determination
+  - [ ] Lookahead/greedy analysis
+  - [ ] Over-expansion/hyper-optimization
