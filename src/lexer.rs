@@ -116,12 +116,11 @@ impl<'a> Lexer<'a> {
 
         // skip whitespace
         let mut start = self.cursor;
-        while start < self.data.len() && self.data[start].is_ascii_whitespace() {
+        while self.data[start].is_ascii_whitespace() {
             start += 1;
-        }
-
-        if start == self.data.len() {
-            return (Token::EOF, start);
+            if start == self.data.len() {
+                return (Token::EOF, start);
+            }
         }
 
         let diff = start - self.cursor;
