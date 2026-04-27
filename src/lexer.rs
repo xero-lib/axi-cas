@@ -98,19 +98,6 @@ pub fn lex_combo<'a>(data: &'a [u8]) -> (Token<'a>, usize) {
     }
 }
 
-// pub fn lex_symbol() {
-//                 /// Unary
-//                 "!" => Token::Fact,
-//                 "~" => Token::Neg,
-
-//                 /// Binary
-//                 "+" => Token::Add,
-//                 "-" => Token::Sub, // handle grouping for neg in parser
-//                 "*" => Token::Mul, // handle grouping for dot product in parser
-//                 "/" => Token::Div, // handle fraction creation determination in parser
-//                 "^" => Token::Pow, 
-// }
-
 pub struct Lexer<'a> {
     data: &'a [u8],
     cursor: usize,
@@ -129,8 +116,12 @@ impl<'a> Lexer<'a> {
 
         // skip whitespace
         let mut start = self.cursor;
-        while self.data[start].is_ascii_whitespace() {
+        while start < self.data.len() && self.data[start].is_ascii_whitespace() {
             start += 1;
+        }
+
+        if start == self.data.len() {
+            return (Token::EOF, start);
         }
 
         let diff = start - self.cursor;
