@@ -1,6 +1,6 @@
 use core::fmt::Display;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum Token<'a> {
     Number(&'a [u8]),
     Hex(&'a [u8]),
