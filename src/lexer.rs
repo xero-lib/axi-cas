@@ -89,6 +89,8 @@ pub fn lex_combo<'a>(data: &'a [u8]) -> (Token<'a>, usize) {
         b":=" => (Token::Def, 2),
         b"||" => (Token::LOr, 2),
         b"&&" => (Token::LAnd, 2),
+        b"!&" => (Token::Nand, 2),
+        b"!|" => (Token::Nor, 2),
         b".." => (Token::Range, 2),
         b"~^" | b"!^" => (Token::Xnor, 2),
 
@@ -125,27 +127,35 @@ impl<'a> Lexer<'a> {
             return (Token::EOF, 0);
         }
 
+        // skip whitespace
+        let mut start = self.cursor;
+        while self.data[start].is_ascii_whitespace() {
+            start += 1;
+        }
+
+        let diff = start - self.cursor;
+
         // check if function
-        let current = self.data[self.cursor];
+        let current = self.data[start];
         
         if current == b'0' && self.cursor + 1 < self.data.len() {
             match self.data[self.cursor + 1] as char {
                 'x' => {
-                    let len = lex_hex(&self.data[self.cursor..]);
+                    let len = lex_hex(&self.data[start..]);
                     if len != 2 {
-                        return (Token::Hex(&self.data[self.cursor..len]), len);
+                        return (Token::Hex(&self.data[start..start + len]), diff + len);
                     }
                 },
                 'b' => {
-                    let len = lex_bin(&self.data[self.cursor..]);
+                    let len = lex_bin(&self.data[start..]);
                     if len != 2 {
-                        return (Token::Bin(&self.data[self.cursor..len]), len);
+                        return (Token::Bin(&self.data[start..start + len]), diff + len);
                     }
                 },
                 'o' => {
-                    let len = lex_oct(&self.data[self.cursor..]);
+                    let len = lex_oct(&self.data[start..]);
                     if len != 2 {
-                        return (Token::Oct(&self.data[self.cursor..len]), len);
+                        return (Token::Oct(&self.data[start..start + len]), diff + len);
                     }
                 },
                 _ => {}
@@ -155,10 +165,10 @@ impl<'a> Lexer<'a> {
 
 
         if current.is_ascii_alphabetic() {
-            let offset = lex_ident(&self.data[self.cursor..]);
-            let slice = &self.data[self.cursor..self.cursor + offset];
+            let offset = lex_ident(&self.data[start..]);
+            let slice = &self.data[start..start + offset];
             if offset > MAX_BUILTIN_FUNC_NAME_LEN {
-                return (Token::Ident(slice), offset)
+                return (Token::Ident(slice), diff + offset)
             }
 
             let token = match slice {
@@ -239,18 +249,18 @@ impl<'a> Lexer<'a> {
                 _ => Token::Ident(slice)
             };
 
-            return (token, offset);
+            return (token, diff + offset);
         }
         
         if current.is_ascii_digit() {
-            let len = lex_num(&self.data[self.cursor..]);
-            return (Token::Number(&self.data[self.cursor..self.cursor + len]), len)
+            let len = lex_num(&self.data[start..]);
+            return (Token::Number(&self.data[start..start + len]), diff + len)
         }
         
-        if self.cursor + 2 < self.data.len() && current.is_ascii_punctuation() {
-            let (token, size) = lex_combo(&self.data[self.cursor..self.cursor + 2]);
+        if start + 2 < self.data.len() && current.is_ascii_punctuation() {
+            let (token, size) = lex_combo(&self.data[start..start + 2]);
             if size != 0 {
-                return (token, size);
+                return (token, diff + size);
             }
         }
 
@@ -259,6 +269,7 @@ impl<'a> Lexer<'a> {
             b'-' => Token::Sub,
             b'*' => Token::Mul,
             b'/' => Token::Div,
+            b'^' => Token::Pow,
             b'~' => Token::Neg,
             b'%' => Token::Percent,
             b'!' => Token::Fact,
@@ -278,7 +289,7 @@ impl<'a> Lexer<'a> {
             _ => Token::Unk(current)
         };
 
-        (token, 1)
+        (token, diff + 1)
     }
 
     pub fn next(&mut self) -> Token<'a> {

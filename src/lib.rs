@@ -1,3 +1,3 @@
 mod token;
-use token::Token;
+pub use token::Token;
 pub mod lexer;
