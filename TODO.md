@@ -4,3 +4,4 @@
   - [ ] Order determination
   - [ ] Lookahead/greedy analysis
   - [ ] Over-expansion/hyper-optimization
+- [ ] Consider LaTeX lexical/parsing support

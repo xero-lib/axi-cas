@@ -1,12 +1,10 @@
 pub enum Token<'a> {
-    Start,
+    Number(&'a [u8]),
+    Hex(&'a [u8]),
+    Bin(&'a [u8]),
+    Oct(&'a [u8]),
 
-    Number(&'a str),
-    Hex(&'a str),
-    Bin(&'a str),
-    Oct(&'a str),
-
-    Ident(&'a str),
+    Ident(&'a [u8]),
     
     /// Trig
     Sin,
@@ -24,12 +22,30 @@ pub enum Token<'a> {
     Asec,
     Acsc,
 
+    /// Hyperbolic Trig
+    Sinh,
+    Cosh,
+    Tanh,
+    Coth,
+    Sech,
+    Csch,
+
+    /// Inverse Hyperbolic Trig
+    Asinh,
+    Acosh,
+    Atanh,
+    Acoth,
+    Asech,
+    Acsch,
+
+    /// Cardinal Trig
+    SincU,
+    SincN,
+
     /// Unary
     Fact,
     Neg,
     Sqrt,
-    Nsum,
-    Nprod,
     Abs,
     Norm,
     Ln,
@@ -45,8 +61,10 @@ pub enum Token<'a> {
     Pow, // remember to track E for sci notation
     Nrt,
     And,
+    LAnd, /// Logical AND
     Nand,
     Or,
+    LOr, /// Logical OR
     Nor,
     Xor,
     Xnor,
@@ -55,9 +73,8 @@ pub enum Token<'a> {
     Cross,
     Mod,
     Union,
+    Percent, // leave as mod?
     Intersect,
-
-    
 
     /// Ternary
     Lim,
@@ -92,7 +109,7 @@ pub enum Token<'a> {
     Rad,
     Ans,
     
-    /// Grouping
+    /// Grouping/Misc
     LParen,
     RParen,
     LBrace,
@@ -101,6 +118,11 @@ pub enum Token<'a> {
     RBrack,
     Uscore,
     Comma,
+    Pipe, // for bitwise or logical OR, abs val, or norm
+    Amp, // for bitwise or logical AND
+    
+    Unk(u8),
+    Skip,
 
     EOF,
 }
